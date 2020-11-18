@@ -14,6 +14,7 @@ program
   .version(pkg.version)
   .option('-t, --type <type>', 'find process by keyword type (pid|port|name)')
   .option('-p, --port', 'find process by port')
+  .option('-pl, --pid-line', 'print pids in one line')
   .arguments('<keyword>')
   .action(function (kw) {
     keyword = kw
@@ -59,13 +60,17 @@ debug('find process by: type = %s, keyword = "%s"', type, keyword)
 find(type, keyword)
   .then(list => {
     if (list.length) {
-      console.log('Found %s process' + (list.length === 1 ? '' : 'es') + '\n', list.length)
+      if (opts.pidLine) {
+        console.log('%s', chalk.white(list.map(item => item.pid).join(' ')));
+      } else {
+        console.log('Found %s process' + (list.length === 1 ? '' : 'es') + '\n', list.length)
 
-      for (const item of list) {
-        console.log(chalk.cyan('[%s]'), item.name || 'unknown')
-        console.log('pid: %s', chalk.white(item.pid))
-        console.log('cmd: %s', chalk.white(item.cmd))
-        console.log()
+        for (const item of list) {
+          console.log(chalk.cyan('[%s]'), item.name || 'unknown')
+          console.log('pid: %s', chalk.white(item.pid))
+          console.log('cmd: %s', chalk.white(item.cmd))
+          console.log()
+        }
       }
     } else {
       console.log('No process found')
